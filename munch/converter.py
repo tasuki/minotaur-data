@@ -55,7 +55,18 @@ def out_pawn(location):
 
     return out_square(occupied)
 
-def convert_one(moves):
+def out_expected(expected):
+    horizontal = out_walls([expected], 'h')
+    vertical = out_walls([expected], 'v')
+
+    if is_movement(expected):
+        pawn = out_pawn(expected)
+    else:
+        pawn = out_square(square(9))
+
+    return (horizontal, vertical, pawn)
+
+def convert_one(moves, expected):
     horizontal_walls = out_walls(moves, 'h')
     vertical_walls = out_walls(moves, 'v')
 
@@ -71,13 +82,18 @@ def convert_one(moves):
     x_walls_left = 10 - len(get_walls(x_moves))
     o_walls_left = 10 - len(get_walls(o_moves))
 
-    return "\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n" % (
+    expected_horizontal, expected_vertical, expected_pawn = out_expected(expected)
+
+    return "\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n-\n\n%s\n\n%s\n\n%s\n" % (
         horizontal_walls,
         vertical_walls,
         x_pawn,
         x_walls_left,
         o_pawn,
-        o_walls_left
+        o_walls_left,
+        expected_horizontal,
+        expected_vertical,
+        expected_pawn,
     )
 
 def convert(record):
@@ -85,7 +101,7 @@ def convert(record):
 
     z = []
     for i in range(1, len(split)):
-        z.append(convert_one(split[0:i]))
+        z.append(convert_one(split[0:i-1], split[i]))
 
     return z
 
@@ -112,7 +128,7 @@ class Test(unittest.TestCase):
         self.assertEqual(find_walls(['e2', 'e3', 'e4', 'e3h', 'c3h', 'd3v'], 'v'), ['d3'])
 
     def test_one(self):
-        self.assertEqual(convert_one("e2;e8;e3;e7;e4;e6;e3h;e5;c3h;e5h;d3v;g5h".split(";")), textwrap.dedent(
+        self.assertEqual(convert_one("e2;e8;e3;e7;e4;e6;e3h;e5;c3h;e5h;d3v;g5h".split(";"), "d1v"), textwrap.dedent(
             """
                 00000000
                 00000000
@@ -155,11 +171,41 @@ class Test(unittest.TestCase):
                 000000000
 
                 8
+
+                -
+
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00010000
+
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
             """
         ))
 
     def test_border(self):
-        self.assertEqual(convert_one(["a1h", "h8v"]), textwrap.dedent(
+        self.assertEqual(convert_one(["a1h", "h8v"], "e2"), textwrap.dedent(
             """
                 00000000
                 00000000
@@ -202,6 +248,36 @@ class Test(unittest.TestCase):
                 000000000
 
                 9
+
+                -
+
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000010000
+                000000000
             """
         ))
 
