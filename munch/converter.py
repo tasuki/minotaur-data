@@ -66,7 +66,7 @@ def out_expected(expected):
 
     return (horizontal, vertical, pawn)
 
-def rotate(square, should_rotate):
+def rotate(square, should_rotate = True):
     if should_rotate == False:
         return square
 
@@ -97,13 +97,24 @@ def convert_one(moves, expected):
     if len(moves) % 2 == 1:
         should_rotate = True
 
+    if should_rotate:
+        onturn_pawn = rotate(o_pawn)
+        onturn_walls = o_walls_left
+        other_pawn = rotate(x_pawn)
+        other_walls = x_walls_left
+    else:
+        onturn_pawn = x_pawn
+        onturn_walls = x_walls_left
+        other_pawn = o_pawn
+        other_walls = o_walls_left
+
     return "\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n-\n\n%s\n\n%s\n\n%s\n" % (
         rotate(horizontal_walls, should_rotate),
         rotate(vertical_walls, should_rotate),
-        rotate(x_pawn, should_rotate),
-        x_walls_left,
-        rotate(o_pawn, should_rotate),
-        o_walls_left,
+        onturn_pawn,
+        onturn_walls,
+        other_pawn,
+        other_walls,
         rotate(expected_horizontal, should_rotate),
         rotate(expected_vertical, should_rotate),
         rotate(expected_pawn, should_rotate),
@@ -113,13 +124,14 @@ def convert(record):
     split = record.split(";")
 
     z = []
-    for i in range(1, len(split)):
-        z.append(convert_one(split[0:i-1], split[i]))
+    for i in range(0, len(split)):
+        z.append(convert_one(split[0:i], split[i]))
 
     return z
 
 
 class Test(unittest.TestCase):
+    maxDiff = None
     record = "e2;e8;e3;e7;e4;e6;e3h;e5;c3h;e5h;d3v;g5h;d1v;d5v;g3h;a3h;h6v;h2v;h8v;f4;f3v;f5;e5;g5;f5;g4;g5;h4;h5;i4;i5;i3"
 
     def test_is_wall_nope(self):
@@ -241,18 +253,6 @@ class Test(unittest.TestCase):
                 000000000
                 000000000
                 000000000
-                000010000
-                000000000
-                000000000
-                000000000
-                000000000
-                000000000
-
-                7
-
-                000000000
-                000000000
-                000000000
                 000000000
                 000010000
                 000000000
@@ -261,6 +261,18 @@ class Test(unittest.TestCase):
                 000000000
 
                 9
+
+                000000000
+                000000000
+                000000000
+                000010000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+
+                7
 
                 -
 
@@ -371,6 +383,162 @@ class Test(unittest.TestCase):
                 000000000
             """
         ))
+
+    def test_moves(self):
+        self.assertEqual(convert("e2;f9"), [
+            textwrap.dedent("""
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000010000
+
+                10
+
+                000010000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+
+                10
+
+                -
+
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000010000
+                000000000
+            """),
+
+            textwrap.dedent("""
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000010000
+
+                10
+
+                000000000
+                000010000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+
+                10
+
+                -
+
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000100000
+            """),
+        ])
+
+    def test_record(self):
+        converted = convert(self.record)
+        self.assertEqual(len(converted), 32)
+
 
 if __name__ == "__main__":
     unittest.main()
