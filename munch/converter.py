@@ -44,7 +44,7 @@ def out_walls(moves, direction):
         row = 8 - int(wall[1])
         occupied[row][col] = '1'
 
-    return out_square(occupied)
+    return occupied
 
 def out_pawn(location):
     col = columns.index(location[0])
@@ -53,7 +53,7 @@ def out_pawn(location):
     occupied = square(9)
     occupied[row][col] = '1'
 
-    return out_square(occupied)
+    return occupied
 
 def out_expected(expected):
     horizontal = out_walls([expected], 'h')
@@ -62,7 +62,7 @@ def out_expected(expected):
     if is_movement(expected):
         pawn = out_pawn(expected)
     else:
-        pawn = out_square(square(9))
+        pawn = square(9)
 
     return (horizontal, vertical, pawn)
 
@@ -70,10 +70,8 @@ def rotate(square, should_rotate = True):
     if should_rotate == False:
         return square
 
-    lst = list(map(lambda row: row[::-1], square.split('\n')))
-
-    rows = [''.join(row) for row in lst[::-1]]
-    return '\n'.join(rows)
+    lst = list(map(lambda row: row[::-1], square))
+    return lst[::-1]
 
 def convert_one(moves, expected):
     horizontal_walls = out_walls(moves, 'h')
@@ -109,15 +107,15 @@ def convert_one(moves, expected):
         other_walls = o_walls_left
 
     return "\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n-\n\n%s\n\n%s\n\n%s\n" % (
-        rotate(horizontal_walls, should_rotate),
-        rotate(vertical_walls, should_rotate),
-        onturn_pawn,
+        out_square(rotate(horizontal_walls, should_rotate)),
+        out_square(rotate(vertical_walls, should_rotate)),
+        out_square(onturn_pawn),
         onturn_walls,
-        other_pawn,
+        out_square(other_pawn),
         other_walls,
-        rotate(expected_horizontal, should_rotate),
-        rotate(expected_vertical, should_rotate),
-        rotate(expected_pawn, should_rotate),
+        out_square(rotate(expected_horizontal, should_rotate)),
+        out_square(rotate(expected_vertical, should_rotate)),
+        out_square(rotate(expected_pawn, should_rotate)),
     )
 
 def convert(record):
