@@ -66,6 +66,15 @@ def out_expected(expected):
 
     return (horizontal, vertical, pawn)
 
+def rotate(square, should_rotate):
+    if should_rotate == False:
+        return square
+
+    lst = list(map(lambda row: row[::-1], square.split('\n')))
+
+    rows = [''.join(row) for row in lst[::-1]]
+    return '\n'.join(rows)
+
 def convert_one(moves, expected):
     horizontal_walls = out_walls(moves, 'h')
     vertical_walls = out_walls(moves, 'v')
@@ -84,16 +93,20 @@ def convert_one(moves, expected):
 
     expected_horizontal, expected_vertical, expected_pawn = out_expected(expected)
 
+    should_rotate = False
+    if len(moves) % 2 == 1:
+        should_rotate = True
+
     return "\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n-\n\n%s\n\n%s\n\n%s\n" % (
-        horizontal_walls,
-        vertical_walls,
-        x_pawn,
+        rotate(horizontal_walls, should_rotate),
+        rotate(vertical_walls, should_rotate),
+        rotate(x_pawn, should_rotate),
         x_walls_left,
-        o_pawn,
+        rotate(o_pawn, should_rotate),
         o_walls_left,
-        expected_horizontal,
-        expected_vertical,
-        expected_pawn,
+        rotate(expected_horizontal, should_rotate),
+        rotate(expected_vertical, should_rotate),
+        rotate(expected_pawn, should_rotate),
     )
 
 def convert(record):
@@ -203,6 +216,84 @@ class Test(unittest.TestCase):
                 000000000
             """
         ))
+
+    def test_rotation(self):
+        self.assertEqual(convert_one("e2;e8;e3;e7;e4;e6;e3h;e5;c3h;e5h;d3v".split(";"), "g5h"), textwrap.dedent(
+            """
+                00000000
+                00000000
+                00010100
+                00000000
+                00010000
+                00000000
+                00000000
+                00000000
+
+                00000000
+                00000000
+                00001000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+
+                000000000
+                000000000
+                000000000
+                000010000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+
+                7
+
+                000000000
+                000000000
+                000000000
+                000000000
+                000010000
+                000000000
+                000000000
+                000000000
+                000000000
+
+                9
+
+                -
+
+                00000000
+                00000000
+                00000000
+                00000000
+                01000000
+                00000000
+                00000000
+                00000000
+
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+                00000000
+
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+                000000000
+            """
+        ))
+
 
     def test_border(self):
         self.assertEqual(convert_one(["a1h", "h8v"], "e2"), textwrap.dedent(
