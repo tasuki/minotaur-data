@@ -70,7 +70,7 @@ def rotate(square, should_rotate = True):
     if should_rotate == False:
         return square
 
-    lst = list(map(lambda row: row[::-1], square))
+    lst = [row[::-1] for row in square]
     return lst[::-1]
 
 def convert_one(moves, expected):
