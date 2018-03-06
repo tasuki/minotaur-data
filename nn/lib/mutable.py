@@ -1,4 +1,19 @@
 from converter import *
+from collections import namedtuple
+
+import numpy as np
+
+Example = namedtuple('Example', [
+    'horizontal',
+    'vertical',
+    'onturn_pawn',
+    'onturn_walls',
+    'other_pawn',
+    'other_walls',
+    'expected_horizontal',
+    'expected_vertical',
+    'expected_pawn',
+])
 
 class Converter:
     def reset(self):
@@ -64,24 +79,24 @@ class Converter:
                 self.x_pawn = square(9)
                 self.x_pawn[move[0]][move[1]] = '1'
 
-    def get_next(self, move_str):
+    def get_next(self, move_str, transfunc):
         move = self.get_move(move_str)
 
         # set move as expected
         self.set_expected(move, '1')
 
-        # assemble output string
-        ret = "\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n-\n\n%s\n\n%s\n\n%s\n" % (
-            out_square(rotate(self.horizontal_walls, self.o_on_turn)),
-            out_square(rotate(self.vertical_walls, self.o_on_turn)),
-            out_square(rotate(self.onturn_pawn, self.o_on_turn)),
+        # assemble output
+        example = transfunc(Example(
+            rotate(self.horizontal_walls, self.o_on_turn),
+            rotate(self.vertical_walls, self.o_on_turn),
+            rotate(self.onturn_pawn, self.o_on_turn),
             self.onturn_walls,
-            out_square(rotate(self.other_pawn, self.o_on_turn)),
+            rotate(self.other_pawn, self.o_on_turn),
             self.other_walls,
-            out_square(rotate(self.expected_horizontal, self.o_on_turn)),
-            out_square(rotate(self.expected_vertical, self.o_on_turn)),
-            out_square(rotate(self.expected_pawn, self.o_on_turn)),
-        )
+            rotate(self.expected_horizontal, self.o_on_turn),
+            rotate(self.expected_vertical, self.o_on_turn),
+            rotate(self.expected_pawn, self.o_on_turn),
+        ))
 
         # reset expected
         self.set_expected(move, '0')
@@ -101,7 +116,33 @@ class Converter:
             self.other_pawn = self.o_pawn
             self.other_walls = self.o_walls_left
 
-        return ret
+        return example
+
+    def example_as_string(self, example):
+        return "\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n-\n\n%s\n\n%s\n\n%s\n" % (
+            out_square(example.horizontal),
+            out_square(example.vertical),
+            out_square(example.onturn_pawn),
+            example.onturn_walls,
+            out_square(example.other_pawn),
+            example.other_walls,
+            out_square(example.expected_horizontal),
+            out_square(example.expected_vertical),
+            out_square(example.expected_pawn),
+        )
+
+    def example_as_numpy(self, example):
+        return Example(
+            np.array(example.horizontal),
+            np.array(example.vertical),
+            np.array(example.onturn_pawn),
+            example.onturn_walls,
+            np.array(example.other_pawn),
+            example.other_walls,
+            np.array(example.expected_horizontal),
+            np.array(example.expected_vertical),
+            np.array(example.expected_pawn),
+        )
 
     def convert(self, record):
         self.reset()
@@ -110,7 +151,7 @@ class Converter:
         z = []
         for i in range(0, len(self.moves)):
             try:
-                z.append(self.get_next(self.moves[i]))
+                z.append(self.get_next(self.moves[i], self.example_as_numpy))
             except IndexError as err:
                 print(self.moves[i])
                 print(record)
