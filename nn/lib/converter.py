@@ -5,7 +5,7 @@ from pprint import pprint
 columns = list('abcdefghi')
 
 def square(dim):
-    return [['0' for i in range(dim)] for j in range(dim)]
+    return [[0 for i in range(dim)] for j in range(dim)]
 
 def is_wall(move):
     if len(move) == 2:
@@ -33,7 +33,7 @@ def find_walls(moves, direction):
     return [wall[:2] for wall in filtered]
 
 def out_square(lst):
-    rows = [''.join(row) for row in lst]
+    rows = [''.join(map(str, row)) for row in lst]
     return '\n'.join(rows)
 
 def out_walls(moves, direction):
@@ -42,7 +42,7 @@ def out_walls(moves, direction):
     for wall in find_walls(moves, direction):
         col = columns.index(wall[0])
         row = 8 - int(wall[1])
-        occupied[row][col] = '1'
+        occupied[row][col] = 1
 
     return occupied
 
@@ -51,7 +51,7 @@ def out_pawn(location):
     row = 9 - int(location[1])
 
     occupied = square(9)
-    occupied[row][col] = '1'
+    occupied[row][col] = 1
 
     return occupied
 

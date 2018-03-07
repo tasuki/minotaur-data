@@ -23,9 +23,9 @@ class Converter:
         self.vertical_walls = square(8)
 
         self.x_pawn = square(9)
-        self.x_pawn[8][4] = '1'
+        self.x_pawn[8][4] = 1
         self.o_pawn = square(9)
-        self.o_pawn[0][4] = '1'
+        self.o_pawn[0][4] = 1
 
         self.x_walls_left = 10
         self.o_walls_left = 10
@@ -68,22 +68,22 @@ class Converter:
                 self.x_walls_left -= 1
 
             if move[2] == 'h':
-                self.horizontal_walls[move[0]][move[1]] = '1'
+                self.horizontal_walls[move[0]][move[1]] = 1
             else:
-                self.vertical_walls[move[0]][move[1]] = '1'
+                self.vertical_walls[move[0]][move[1]] = 1
         else:
             if self.o_on_turn:
                 self.o_pawn = square(9)
-                self.o_pawn[move[0]][move[1]] = '1'
+                self.o_pawn[move[0]][move[1]] = 1
             else:
                 self.x_pawn = square(9)
-                self.x_pawn[move[0]][move[1]] = '1'
+                self.x_pawn[move[0]][move[1]] = 1
 
     def get_next(self, move_str, transfunc):
         move = self.get_move(move_str)
 
         # set move as expected
-        self.set_expected(move, '1')
+        self.set_expected(move, 1)
 
         # assemble output
         example = transfunc(Example(
@@ -99,7 +99,7 @@ class Converter:
         ))
 
         # reset expected
-        self.set_expected(move, '0')
+        self.set_expected(move, 0)
 
         # modify state with move
         self.play(move)
@@ -131,18 +131,24 @@ class Converter:
             out_square(example.expected_pawn),
         )
 
+    def pad_walls(self, walls):
+        return np.pad(np.array(walls), (0, 1), 'constant')
+
+    def pad_wallcount(self, wallcount):
+        return np.full((9, 9), wallcount)
+
     def example_as_numpy(self, example):
-        return Example(
-            np.array(example.horizontal),
-            np.array(example.vertical),
-            np.array(example.onturn_pawn),
-            example.onturn_walls,
-            np.array(example.other_pawn),
-            example.other_walls,
-            np.array(example.expected_horizontal),
-            np.array(example.expected_vertical),
-            np.array(example.expected_pawn),
-        )
+        return np.array([
+            self.pad_walls(example.horizontal),
+            self.pad_walls(example.vertical),
+            example.onturn_pawn,
+            self.pad_wallcount(example.onturn_walls),
+            example.other_pawn,
+            self.pad_wallcount(example.other_walls),
+            self.pad_walls(example.expected_horizontal),
+            self.pad_walls(example.expected_vertical),
+            example.expected_pawn,
+        ])
 
     def convert(self, record):
         self.reset()
