@@ -8,10 +8,12 @@ data_dir = sys.argv[1]
 
 c = Converter()
 
-def add_to_set(dset, data, inx_prev):
-    inx_cur = inx_prev + len(data)
+def add_to_sets(x, y, data, inx_prev):
+    np_data = np.array(data)
+    inx_cur = inx_prev + len(np_data)
     print(inx_prev, inx_cur)
-    dset[inx_prev:inx_cur] = data
+    x[inx_prev:inx_cur] = np_data[:,0:6]
+    y[inx_prev:inx_cur] = np_data[:,6:9]
 
     return inx_cur
 
@@ -25,7 +27,8 @@ def convert_set(path, hf):
     print(len(games))
     print(moves)
 
-    dset = hf.create_dataset("samples", shape=(moves, 9, 9, 9), dtype=np.uint8)
+    x = hf.create_dataset("x", shape=(moves, 6, 9, 9), dtype=np.uint8)
+    y = hf.create_dataset("y", shape=(moves, 3, 9, 9), dtype=np.uint8)
 
     cur = 0
     inx_prev = 0
@@ -34,10 +37,10 @@ def convert_set(path, hf):
         cur += 1
         data.extend(c.convert(record.strip()))
         if cur % 1000 == 0:
-            inx_prev = add_to_set(dset, data, inx_prev)
+            inx_prev = add_to_sets(x, y, data, inx_prev)
             data = []
 
-    add_to_set(dset, data, inx_prev)
+    add_to_sets(x, y, data, inx_prev)
 
 def convert_all():
     data_sets = [
