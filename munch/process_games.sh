@@ -10,3 +10,5 @@ cat "$DATADIR"/records-all.txt | sort | uniq -u > "$DATADIR"/records-clean.txt
 
 # create train/valid/test data sets
 python split_records.py "$DATADIR"
+
+python convert_records.py "$DATADIR"

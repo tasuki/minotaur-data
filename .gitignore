@@ -1,4 +1,5 @@
 .ipynb_checkpoints
 *.pyc
 data/records*.txt
+data/records*.h5
 env/
