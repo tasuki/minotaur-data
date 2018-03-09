@@ -31,14 +31,14 @@ x_valid, y_valid = get_x_y(valid_data, classes)
 
 
 lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1), cooldown=0, patience=5, min_lr=0.5e-6)
-early_stopper = EarlyStopping(min_delta=0.001, patience=10)
+early_stopper = EarlyStopping(monitor='val_loss', min_delta=0.001, patience=1)
 csv_logger = CSVLogger('01_first_nn.csv')
 
 model.fit(
     x_train,
     y_train,
-    batch_size=128,
-    epochs=10,
+    batch_size=1024,
+    epochs=5,
     validation_data=(x_valid, y_valid),
     shuffle=True,
     callbacks=[lr_reducer, early_stopper, csv_logger]
