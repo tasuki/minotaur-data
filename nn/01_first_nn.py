@@ -1,3 +1,5 @@
+import os
+
 import h5py
 import numpy as np
 
@@ -6,6 +8,8 @@ import keras.utils.np_utils
 from keras.callbacks import ReduceLROnPlateau, CSVLogger, EarlyStopping
 
 import keras_resnet.models
+
+fname = os.path.basename(__file__)[:-3]
 
 shape, classes = (6, 9, 9), 3*9*9
 inp = keras.layers.Input(shape)
@@ -27,12 +31,12 @@ valid_data = h5py.File("../data/records-2-valid.h5")
 x_valid, y_valid = get_x_y(valid_data, classes)
 
 test_data = h5py.File("../data/records-3-test.h5")
-x_valid, y_valid = get_x_y(valid_data, classes)
+x_test, y_test = get_x_y(test_data, classes)
 
 
 lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1), cooldown=0, patience=5, min_lr=0.5e-6)
 early_stopper = EarlyStopping(monitor='val_loss', min_delta=0.001, patience=1)
-csv_logger = CSVLogger('01_first_nn.csv')
+csv_logger = CSVLogger(fname + '.csv')
 
 model.fit(
     x_train,
@@ -44,4 +48,4 @@ model.fit(
     callbacks=[lr_reducer, early_stopper, csv_logger]
 )
 
-model.save('01_first_nn_10_epochs.h5')
+model.save(fname + '.h5')
