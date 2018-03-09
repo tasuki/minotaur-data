@@ -21,3 +21,12 @@ Then install everything:
 
 There's a jupyter notebook analysing the data. Run `jupyter notebook` and
 navigate to `analysis/Quoridor-BGA-stats.ipynb`.
+
+## Munch
+
+Before training anything, the data needs to be munched. Cd to `munch` and run
+`bash process_games.sh`.
+
+## NN
+
+Here be dragons.
