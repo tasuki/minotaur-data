@@ -1,12 +1,13 @@
+env/
+tmp/
+
 *.pyc
 __pycache__
 
 .ipynb_checkpoints
 
+*.h5
 data/records*.txt
-data/records*.h5
-
-env/
-
 bga-games*
+
 run.py
