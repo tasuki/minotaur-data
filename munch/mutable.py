@@ -79,6 +79,19 @@ class Converter:
                 self.x_pawn = square(9)
                 self.x_pawn[move[0]][move[1]] = 1
 
+    def update_onturn(self):
+        self.o_on_turn = not self.o_on_turn
+        if self.o_on_turn:
+            self.onturn_pawn = self.o_pawn
+            self.onturn_walls = self.o_walls_left
+            self.other_pawn = self.x_pawn
+            self.other_walls = self.x_walls_left
+        else:
+            self.onturn_pawn = self.x_pawn
+            self.onturn_walls = self.x_walls_left
+            self.other_pawn = self.o_pawn
+            self.other_walls = self.o_walls_left
+
     def get_next(self, move_str, transfunc):
         move = self.get_move(move_str)
 
@@ -104,17 +117,7 @@ class Converter:
         # modify state with move
         self.play(move)
 
-        self.o_on_turn = not self.o_on_turn
-        if self.o_on_turn:
-            self.onturn_pawn = self.o_pawn
-            self.onturn_walls = self.o_walls_left
-            self.other_pawn = self.x_pawn
-            self.other_walls = self.x_walls_left
-        else:
-            self.onturn_pawn = self.x_pawn
-            self.onturn_walls = self.x_walls_left
-            self.other_pawn = self.o_pawn
-            self.other_walls = self.o_walls_left
+        self.update_onturn()
 
         return example
 
