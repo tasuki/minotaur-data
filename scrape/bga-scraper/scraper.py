@@ -6,8 +6,9 @@ import time
 from bs4 import BeautifulSoup
 
 class Scraper:
-  def __init__(self, httpClient):
+  def __init__(self, httpClient, toDir):
     self.httpClient = httpClient
+    self.toDir = toDir
 
   def getDetailLink(self, gameId):
     response = self.httpClient.getGameInfo(gameId)
@@ -46,7 +47,7 @@ class Scraper:
     return record
 
   def fetchAndSave(self, gameId):
-    fname = 'bga-games/%s.js' % gameId
+    fname = self.toDir + '/%s.js' % gameId
 
     if os.path.isfile(fname):
       print("Already saved game " + gameId)

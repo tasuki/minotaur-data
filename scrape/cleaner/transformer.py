@@ -6,8 +6,8 @@ import re
 class IgnorableError(RuntimeError):
   pass
 
-from_dir = "../bga-scraper/bga-games/"
-to_file = "bga-games.txt"
+from_dir = "../bga-games/"
+to_file = "../bga-games.txt"
 
 def toAlpha(num):
   alpha = "abcdefghi"

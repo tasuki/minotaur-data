@@ -10,7 +10,7 @@ from client import HttpClient
 from scraper import Scraper
 
 client = HttpClient('username', 'password')
-scraper = Scraper(client)
+scraper = Scraper(client, '../bga-games/')
 
 client.login()
 scraper.loopGameList()
