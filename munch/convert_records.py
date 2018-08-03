@@ -1,4 +1,4 @@
-from mutable import Converter
+from .mutable import Converter
 
 import numpy as np
 import h5py

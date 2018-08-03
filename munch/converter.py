@@ -2,6 +2,8 @@ import unittest
 import textwrap
 from pprint import pprint
 
+import numpy as np
+
 columns = list('abcdefghi')
 
 def square(dim):
@@ -73,7 +75,7 @@ def rotate(square, should_rotate = True):
     lst = [row[::-1] for row in square]
     return lst[::-1]
 
-def convert_one(moves, expected):
+def convert_in(moves, should_rotate):
     horizontal_walls = out_walls(moves, 'h')
     vertical_walls = out_walls(moves, 'v')
 
@@ -89,12 +91,6 @@ def convert_one(moves, expected):
     x_walls_left = 10 - len(get_walls(x_moves))
     o_walls_left = 10 - len(get_walls(o_moves))
 
-    expected_horizontal, expected_vertical, expected_pawn = out_expected(expected)
-
-    should_rotate = False
-    if len(moves) % 2 == 1:
-        should_rotate = True
-
     if should_rotate:
         onturn_pawn = rotate(o_pawn)
         onturn_walls = o_walls_left
@@ -106,17 +102,51 @@ def convert_one(moves, expected):
         other_pawn = o_pawn
         other_walls = o_walls_left
 
-    return "\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n-\n\n%s\n\n%s\n\n%s\n" % (
-        out_square(rotate(horizontal_walls, should_rotate)),
-        out_square(rotate(vertical_walls, should_rotate)),
-        out_square(onturn_pawn),
+    return (
+        rotate(horizontal_walls, should_rotate),
+        rotate(vertical_walls, should_rotate),
+        onturn_pawn,
         onturn_walls,
-        out_square(other_pawn),
+        other_pawn,
         other_walls,
+    )
+
+def convert_one(moves, expected):
+    should_rotate = len(moves) % 2 == 1
+    hw, vw, tp, tw, op, ow = convert_in(moves, should_rotate)
+
+    expected_horizontal, expected_vertical, expected_pawn = out_expected(expected)
+
+    return "\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n-\n\n%s\n\n%s\n\n%s\n" % (
+        out_square(hw),
+        out_square(vw),
+        out_square(tp),
+        tw,
+        out_square(op),
+        ow,
         out_square(rotate(expected_horizontal, should_rotate)),
         out_square(rotate(expected_vertical, should_rotate)),
         out_square(rotate(expected_pawn, should_rotate)),
     )
+
+def pad_walls(walls):
+    return np.pad(np.array(walls), (0, 1), 'constant')
+
+def pad_wallcount(wallcount):
+    return np.full((9, 9), wallcount)
+
+def convert_record(moves):
+    should_rotate = len(moves) % 2 == 1
+    hw, vw, tp, tw, op, ow = convert_in(moves, should_rotate)
+
+    return np.array([
+        pad_walls(hw),
+        pad_walls(vw),
+        tp,
+        pad_wallcount(tw),
+        op,
+        pad_wallcount(ow),
+    ])
 
 def convert(record):
     split = record.split(";")
