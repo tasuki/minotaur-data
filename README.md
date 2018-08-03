@@ -16,6 +16,10 @@ Then install everything:
 
     pip install -r requirements.txt
 
+## Scrape
+
+This has been done already (see the `scrape` dir). The results are in
+`/home/vita/data/prog/minotaur-data`.
 
 ## Analysis
 
