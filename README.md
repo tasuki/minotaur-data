@@ -34,3 +34,7 @@ Before training anything, the data needs to be munched. Cd to `munch` and run
 ## NN
 
 Here be dragons.
+
+## Server
+
+Run `python run_server.py` to cerwate a http interface for the quoridor nn.
